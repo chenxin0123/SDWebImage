@@ -229,7 +229,6 @@ static NSString *const kCompletedCallbackKey = @"completed";
 /**
  * 为一个url添加progressBlock completedBlock 放入URLCallbacks
  * 如果是第一次为该url添加 则执行createCallback 否则createCallback不会被执行
- * READ
  */
 - (void)addProgressCallback:(SDWebImageDownloaderProgressBlock)progressBlock completedBlock:(SDWebImageDownloaderCompletedBlock)completedBlock forURL:(NSURL *)url createCallback:(SDWebImageNoParamsBlock)createCallback {
     // The URL will be used as the key to the callbacks dictionary so it cannot be nil. If it is nil immediately call the completed block with no image or data.
