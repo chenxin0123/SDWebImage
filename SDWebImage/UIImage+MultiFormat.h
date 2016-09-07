@@ -1,4 +1,4 @@
-//
+//!
 //  UIImage+MultiFormat.h
 //  SDWebImage
 //
@@ -10,6 +10,9 @@
 
 @interface UIImage (MultiFormat)
 
+/**
+ * NSData -> UIImage 自动判断图片格式 webp gif jpeg png
+ */
 + (UIImage *)sd_imageWithData:(NSData *)data;
 
 @end

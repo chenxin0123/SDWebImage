@@ -31,7 +31,7 @@ NSString *const SDWebImageDownloadFinishNotification = @"SDWebImageDownloadFinis
 // the task associated with this operation
 @property (weak, nonatomic) NSURLSession *unownedSession;
 // This is set if we're using not using an injected NSURLSession. We're responsible of invalidating this one
-@property (strong, nonatomic) NSURLSession *ownedSession;
+@property (strong, nonatomic) NSURLSession *ownedSession;///<unownedSession为空的时候才会创建
 
 @property (strong, nonatomic, readwrite) NSURLSessionTask *dataTask;
 
@@ -88,6 +88,10 @@ NSString *const SDWebImageDownloadFinishNotification = @"SDWebImageDownloadFinis
     return self;
 }
 
+/**
+ * 开启下载任务
+ * 发送SDWebImageDownloadStartNotification通知
+ */
 - (void)start {
     @synchronized (self) {
         if (self.isCancelled) {
@@ -180,6 +184,7 @@ NSString *const SDWebImageDownloadFinishNotification = @"SDWebImageDownloadFinis
     [self cancelInternal];
 }
 
+///停止下载任务并post SDWebImageDownloadStopNotification
 - (void)cancelInternal {
     if (self.isFinished) return;
     [super cancel];
@@ -206,6 +211,7 @@ NSString *const SDWebImageDownloadFinishNotification = @"SDWebImageDownloadFinis
     [self reset];
 }
 
+///清理所有属性
 - (void)reset {
     self.cancelBlock = nil;
     self.completedBlock = nil;
@@ -218,6 +224,8 @@ NSString *const SDWebImageDownloadFinishNotification = @"SDWebImageDownloadFinis
         self.ownedSession = nil;
     }
 }
+
+///KVO
 
 - (void)setFinished:(BOOL)finished {
     [self willChangeValueForKey:@"isFinished"];
@@ -237,12 +245,13 @@ NSString *const SDWebImageDownloadFinishNotification = @"SDWebImageDownloadFinis
 
 #pragma mark NSURLSessionDataDelegate
 
+///POST SDWebImageDownloadReceiveResponseNotification 或者 SDWebImageDownloadStopNotification
 - (void)URLSession:(NSURLSession *)session
           dataTask:(NSURLSessionDataTask *)dataTask
 didReceiveResponse:(NSURLResponse *)response
  completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler {
     
-    //'304 Not Modified' is an exceptional one
+    //'304 Not Modified' is an exceptional one <400都算正常的返回码
     if (![response respondsToSelector:@selector(statusCode)] || ([((NSHTTPURLResponse *)response) statusCode] < 400 && [((NSHTTPURLResponse *)response) statusCode] != 304)) {
         NSInteger expected = response.expectedContentLength > 0 ? (NSInteger)response.expectedContentLength : 0;
         self.expectedSize = expected;
@@ -281,6 +290,7 @@ didReceiveResponse:(NSURLResponse *)response
     }
 }
 
+///获取图片大小 方向 partialImage 调用progressBlock
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
     [self.imageData appendData:data];
 
@@ -366,6 +376,7 @@ didReceiveResponse:(NSURLResponse *)response
     }
 }
 
+///是否需要缓冲
 - (void)URLSession:(NSURLSession *)session
           dataTask:(NSURLSessionDataTask *)dataTask
  willCacheResponse:(NSCachedURLResponse *)proposedResponse
@@ -384,7 +395,7 @@ didReceiveResponse:(NSURLResponse *)response
 }
 
 #pragma mark NSURLSessionTaskDelegate
-
+///Post SDWebImageDownloadStopNotification, Call completedBlock
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
     @synchronized(self) {
         self.thread = nil;
@@ -411,6 +422,7 @@ didReceiveResponse:(NSURLResponse *)response
              *    and images for which responseFromCached is YES (only the ones that cannot be cached).
              *  Note: responseFromCached is set to NO inside `willCacheResponse:`. This method doesn't get called for large images or images behind authentication 
              */
+            ///SDWebImageDownloaderIgnoreCachedResponse  且 图片是从缓存中取的
             if (self.options & SDWebImageDownloaderIgnoreCachedResponse && responseFromCached && [[NSURLCache sharedURLCache] cachedResponseForRequest:self.request]) {
                 completionBlock(nil, nil, nil, YES);
             } else if (self.imageData) {
@@ -471,7 +483,7 @@ didReceiveResponse:(NSURLResponse *)response
 }
 
 #pragma mark Helper methods
-
+///NSInteger -> UIImageOrientation
 + (UIImageOrientation)orientationFromPropertyValue:(NSInteger)value {
     switch (value) {
         case 1:

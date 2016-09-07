@@ -93,6 +93,7 @@ typedef NSDictionary *(^SDWebImageDownloaderHeadersFilterBlock)(NSURL *url, NSDi
 
 /**
  *  The timeout value (in seconds) for the download operation. Default: 15.0.
+ *  downloadTimeout>NSURLSessionConfiguration>NSURLSession
  */
 @property (assign, nonatomic) NSTimeInterval downloadTimeout;
 

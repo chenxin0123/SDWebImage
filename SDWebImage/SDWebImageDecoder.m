@@ -12,6 +12,11 @@
 
 @implementation UIImage (ForceDecode)
 
+/**
+ * 将图片cache方便后面加载更快
+ * 如果图片包含alpha通道则不处理
+ * 如果不包含alpha通道则解压并去除alpha通道
+ */
 + (UIImage *)decodedImageWithImage:(UIImage *)image {
     // while downloading huge amount of images
     // autorelease the bitmap context

@@ -1,4 +1,4 @@
-//
+//！
 //  UIImage+GIF.h
 //  LBGIFImage
 //

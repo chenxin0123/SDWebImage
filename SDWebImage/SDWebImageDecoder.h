@@ -1,4 +1,4 @@
-/*
+/*!
  * This file is part of the SDWebImage package.
  * (c) Olivier Poitrey <rs@dailymotion.com>
  *
@@ -12,7 +12,9 @@
 #import "SDWebImageCompat.h"
 
 @interface UIImage (ForceDecode)
-
+/**
+ *  Decompressing images that are downloaded and cached can improve performance but can consume lot of memory.
+ */
 + (UIImage *)decodedImageWithImage:(UIImage *)image;
 
 @end

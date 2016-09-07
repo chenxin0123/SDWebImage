@@ -15,10 +15,10 @@ static NSString *const kCompletedCallbackKey = @"completed";
 
 @interface SDWebImageDownloader () <NSURLSessionTaskDelegate, NSURLSessionDataDelegate>
 
-@property (strong, nonatomic) NSOperationQueue *downloadQueue;
+@property (strong, nonatomic) NSOperationQueue *downloadQueue;///<[NSOperationQueue new]
 @property (weak, nonatomic) NSOperation *lastAddedOperation;
-@property (assign, nonatomic) Class operationClass;
-@property (strong, nonatomic) NSMutableDictionary *URLCallbacks;
+@property (assign, nonatomic) Class operationClass;///<SDWebImageDownloaderOperation
+@property (strong, nonatomic) NSMutableDictionary *URLCallbacks;///<key为url 存放字典 自动含kProgressCallbackKey kCompletedCallbackKey
 @property (strong, nonatomic) NSMutableDictionary *HTTPHeaders;
 // This queue is used to serialize the handling of the network responses of all the download operation in a single queue
 @property (SDDispatchQueueSetterSementics, nonatomic) dispatch_queue_t barrierQueue;
@@ -30,6 +30,7 @@ static NSString *const kCompletedCallbackKey = @"completed";
 
 @implementation SDWebImageDownloader
 
+///SDNetworkActivityIndicator
 + (void)initialize {
     // Bind SDNetworkActivityIndicator if available (download it here: http://github.com/rs/SDNetworkActivityIndicator )
     // To use it, just add #import "SDNetworkActivityIndicator.h" in addition to the SDWebImage import
@@ -62,6 +63,9 @@ static NSString *const kCompletedCallbackKey = @"completed";
     return instance;
 }
 
+/**
+ * 初始化属性 创建session
+ */
 - (id)init {
     if ((self = [super init])) {
         _operationClass = [SDWebImageDownloaderOperation class];
@@ -94,6 +98,7 @@ static NSString *const kCompletedCallbackKey = @"completed";
     return self;
 }
 
+///invalidate session cancelAllOperations
 - (void)dealloc {
     [self.session invalidateAndCancel];
     self.session = nil;
@@ -102,6 +107,7 @@ static NSString *const kCompletedCallbackKey = @"completed";
     SDDispatchQueueRelease(_barrierQueue);
 }
 
+///value为nil表示移除
 - (void)setValue:(NSString *)value forHTTPHeaderField:(NSString *)field {
     if (value) {
         self.HTTPHeaders[field] = value;
@@ -131,6 +137,11 @@ static NSString *const kCompletedCallbackKey = @"completed";
     _operationClass = operationClass ?: [SDWebImageDownloaderOperation class];
 }
 
+
+/**
+ * 调用[self addProgressCallback:progressBlock completedBlock:completedBlock forURL:url createCallback:^{
+ * READ
+ */
 - (id <SDWebImageOperation>)downloadImageWithURL:(NSURL *)url options:(SDWebImageDownloaderOptions)options progress:(SDWebImageDownloaderProgressBlock)progressBlock completed:(SDWebImageDownloaderCompletedBlock)completedBlock {
     __block SDWebImageDownloaderOperation *operation;
     __weak __typeof(self)wself = self;
@@ -215,6 +226,11 @@ static NSString *const kCompletedCallbackKey = @"completed";
     return operation;
 }
 
+/**
+ * 为一个url添加progressBlock completedBlock 放入URLCallbacks
+ * 如果是第一次为该url添加 则执行createCallback 否则createCallback不会被执行
+ * READ
+ */
 - (void)addProgressCallback:(SDWebImageDownloaderProgressBlock)progressBlock completedBlock:(SDWebImageDownloaderCompletedBlock)completedBlock forURL:(NSURL *)url createCallback:(SDWebImageNoParamsBlock)createCallback {
     // The URL will be used as the key to the callbacks dictionary so it cannot be nil. If it is nil immediately call the completed block with no image or data.
     if (url == nil) {

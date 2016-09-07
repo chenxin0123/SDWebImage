@@ -1,4 +1,4 @@
-/*
+/*！
  * This file is part of the SDWebImage package.
  * (c) Olivier Poitrey <rs@dailymotion.com>
  *
@@ -68,7 +68,7 @@ typedef void(^SDWebImageCalculateSizeBlock)(NSUInteger fileCount, NSUInteger tot
 @property (assign, nonatomic) NSInteger maxCacheAge;
 
 /**
- * The maximum size of the cache, in bytes.
+ * The maximum size of the cache, in bytes. disk cache
  */
 @property (assign, nonatomic) NSUInteger maxCacheSize;
 

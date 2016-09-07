@@ -11,6 +11,12 @@
 
 @implementation UIImage (GIF)
 
+/**
+ * 先判断共几张图
+ * 如果只有一张直接调用[[UIImage alloc] initWithData:data]
+ * 多张的话 遍历所有CGImageSourceCreateImageAtIndex 获得一个UIImage数组以及总时长
+ * 调用[UIImage animatedImageWithImages:images duration:duration]
+ */
 + (UIImage *)sd_animatedGIFWithData:(NSData *)data {
     if (!data) {
         return nil;
@@ -55,6 +61,12 @@
     return animatedImage;
 }
 
+/**
+ *  返回第index帧的持续时间
+ *
+ *  @param source CGImageSourceCreateWithData
+ *
+ */
 + (float)sd_frameDurationAtIndex:(NSUInteger)index source:(CGImageSourceRef)source {
     float frameDuration = 0.1f;
     CFDictionaryRef cfFrameProperties = CGImageSourceCopyPropertiesAtIndex(source, index, nil);
@@ -86,6 +98,10 @@
     return frameDuration;
 }
 
+/**
+ * name@2x.gif name.gif [UIImage imageNamed:name]
+ * 获取到NSdata 调用sd_animatedGIFWithData
+ */
 + (UIImage *)sd_animatedGIFNamed:(NSString *)name {
     CGFloat scale = [UIScreen mainScreen].scale;
 
@@ -121,6 +137,9 @@
     }
 }
 
+/**
+ * 裁剪git图片
+ */
 - (UIImage *)sd_animatedImageByScalingAndCroppingToSize:(CGSize)size {
     if (CGSizeEqualToSize(self.size, size) || CGSizeEqualToSize(size, CGSizeZero)) {
         return self;

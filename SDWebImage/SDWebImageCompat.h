@@ -1,4 +1,4 @@
-/*
+/*！
  * This file is part of the SDWebImage package.
  * (c) Olivier Poitrey <rs@dailymotion.com>
  * (c) Jamie Pinkham
@@ -51,6 +51,9 @@
 #define SDDispatchQueueSetterSementics assign
 #endif
 
+/**
+ * key @2x. @3x. 从key中获取scale 默认为1
+ */
 extern UIImage *SDScaledImageForKey(NSString *key, UIImage *image);
 
 typedef void(^SDWebImageNoParamsBlock)();

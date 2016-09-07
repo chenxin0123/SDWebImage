@@ -35,6 +35,7 @@
 #endif
     else {
         image = [[UIImage alloc] initWithData:data];
+        
         UIImageOrientation orientation = [self sd_imageOrientationFromImageData:data];
         if (orientation != UIImageOrientationUp) {
             image = [UIImage imageWithCGImage:image.CGImage
