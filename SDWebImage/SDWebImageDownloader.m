@@ -139,10 +139,12 @@ static NSString *const kCompletedCallbackKey = @"completed";
 
 
 /**
- * 调用[self addProgressCallback:progressBlock completedBlock:completedBlock forURL:url createCallback:
+ * 调用[self addProgressCallback:progressBlock completedBlock:completedBlock forURL:url createCallback: 避免重复请求
  * createCallback中如果有SDWebImageDownloaderUseNSURLCache则使用默认缓存策略 否则使用NSURLRequestReloadIgnoringLocalCacheData
- *
- * READ
+ * 用headersFilter来过滤请求头
+ * 创建请求 创建operation
+ * completed回调中清除所有该url的callbacks
+ * LIFO控制
  */
 - (id <SDWebImageOperation>)downloadImageWithURL:(NSURL *)url options:(SDWebImageDownloaderOptions)options progress:(SDWebImageDownloaderProgressBlock)progressBlock completed:(SDWebImageDownloaderCompletedBlock)completedBlock {
     __block SDWebImageDownloaderOperation *operation;
@@ -231,7 +233,7 @@ static NSString *const kCompletedCallbackKey = @"completed";
 /**
  * 为一个url添加progressBlock completedBlock 放入URLCallbacks
  * 如果是第一次为该url添加 则执行createCallback 否则createCallback不会被执行
- * READ 为什么用sync
+ * 对URLCallbacks写操作 所有用dispatch_barrier_sync caller要持有createCallback中创建的operation 所以用sync
  */
 - (void)addProgressCallback:(SDWebImageDownloaderProgressBlock)progressBlock completedBlock:(SDWebImageDownloaderCompletedBlock)completedBlock forURL:(NSURL *)url createCallback:(SDWebImageNoParamsBlock)createCallback {
     // The URL will be used as the key to the callbacks dictionary so it cannot be nil. If it is nil immediately call the completed block with no image or data.

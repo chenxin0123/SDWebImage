@@ -54,6 +54,7 @@
     return self.manager.imageDownloader.maxConcurrentDownloads;
 }
 
+///self.manager downloadImageWithURL 在completedBlock中设置属性
 - (void)startPrefetchingAtIndex:(NSUInteger)index {
     if (index >= self.prefetchURLs.count) return;
     self.requestedCount++;
@@ -80,6 +81,7 @@
                                 totalCount:self.prefetchURLs.count
              ];
         }
+        
         if (self.prefetchURLs.count > self.requestedCount) {
             dispatch_async(self.prefetcherQueue, ^{
                 [self startPrefetchingAtIndex:self.requestedCount];
@@ -109,6 +111,10 @@
     [self prefetchURLs:urls progress:nil completed:nil];
 }
 
+/**
+ * 取消之前的所有下载任务
+ * 逐个开始下载
+ */
 - (void)prefetchURLs:(NSArray *)urls progress:(SDWebImagePrefetcherProgressBlock)progressBlock completed:(SDWebImagePrefetcherCompletionBlock)completionBlock {
     [self cancelPrefetching]; // Prevent duplicate prefetch request
     self.startedTime = CFAbsoluteTimeGetCurrent();
@@ -129,6 +135,7 @@
     }
 }
 
+///清空所有属性 停止所有operation
 - (void)cancelPrefetching {
     self.prefetchURLs = nil;
     self.skippedCount = 0;

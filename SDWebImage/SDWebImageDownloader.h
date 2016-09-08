@@ -1,4 +1,4 @@
-/*
+/*!
  * This file is part of the SDWebImage package.
  * (c) Olivier Poitrey <rs@dailymotion.com>
  *
@@ -73,7 +73,9 @@ typedef void(^SDWebImageDownloaderCompletedBlock)(UIImage *image, NSData *data, 
 typedef NSDictionary *(^SDWebImageDownloaderHeadersFilterBlock)(NSURL *url, NSDictionary *headers);
 
 /**
- * Asynchronous downloader dedicated and optimized for image loading.
+ * Asynchronous downloader dedicated and optimized for image loading. 
+ * 下载的图片不会自动缓存 需要用户在completedBlock中处理
+ * SDWebImageDownloader使用SDWebImageDownloaderOperation创建下载任务
  */
 @interface SDWebImageDownloader : NSObject
 
