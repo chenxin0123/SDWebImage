@@ -14,6 +14,7 @@ static char imageURLStorageKey;
 
 @implementation UIButton (WebCache)
 
+///根据当前的state返回url 如果url为nil 则返回UIControlStateNormal的url
 - (NSURL *)sd_currentImageURL {
     NSURL *url = self.imageURLStorage[@(self.state)];
 
@@ -24,6 +25,7 @@ static char imageURLStorageKey;
     return url;
 }
 
+///返回指定状态的url
 - (NSURL *)sd_imageURLForState:(UIControlState)state {
     return self.imageURLStorage[@(state)];
 }
